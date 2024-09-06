@@ -25,7 +25,7 @@ struct NodoAVL
     int habilitados;
     int deshabilitados;
 
-    NodoAVL(Libro *libro) : libro(libro), izq(NULL), der(NULL), altura(1), habilitados(1), deshabilitados(0) {}
+    NodoAVL(Libro *libro) : libro(libro), izq(NULL), der(NULL), altura(0), habilitados(1), deshabilitados(0) {}
 };
 
 int alt(NodoAVL *nodo)
@@ -167,8 +167,22 @@ void toggle(NodoAVL *nodo, int id)
 {
     if (Libro *libro = findLibro(nodo, id))
     {
-        libro->habilitado = !libro->habilitado; // Cambiar el estado habilitado/deshabilitado
-        actualizarHabilitados(nodo); // Actualizar el nodo actual
+        libro->habilitado = !libro->habilitado; // lo cambiamos de estado
+
+        NodoAVL *aux = nodo;
+
+        //hacemos esto para actualizar los nodos hasta llegar al nodo con su respectivo id, probablemente haya otra mejor forma pero explotaba todo y asi funciona :)
+
+        while (aux != NULL)
+        {
+            if (id < aux->libro->id)
+                aux = aux->izq;
+            else if (id > aux->libro->id)
+                aux = aux->der;
+            else
+                break;
+        }
+        actualizarHabilitados(aux); 
     }
 }
 
@@ -202,7 +216,7 @@ int main()
     NodoAVL *arbol = NULL;
     int n;
     cin >> n;
-    cin.ignore(); // Ignorar el salto de línea
+    cin.ignore(); // Ignorar el salto de línea, si le saco esto se rompe todo.
 
     for (int i = 0; i < n; i++)
     {
