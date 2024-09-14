@@ -1,6 +1,7 @@
 #include <cassert>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <limits>
 
 // 💛🖤
@@ -22,10 +23,8 @@ struct NodoAVL
     NodoAVL *izq;
     NodoAVL *der;
     int altura;
-    int habilitados;
-    int deshabilitados;
 
-    NodoAVL(Libro *libro) : libro(libro), izq(NULL), der(NULL), altura(0), habilitados(1), deshabilitados(0) {}
+    NodoAVL(Libro *libro) : libro(libro), izq(NULL), der(NULL), altura(0) {}
 };
 
 int alt(NodoAVL *nodo)
@@ -38,19 +37,19 @@ int obtenerBalance(NodoAVL *nodo)
     return nodo ? alt(nodo->izq) - alt(nodo->der) : 0;
 }
 
-void actualizarHabilitados(NodoAVL *nodo)
-{
-    if (!nodo)
-        return;
+// void actualizarHabilitados(NodoAVL *nodo)
+// {
+//     if (!nodo)
+//         return;
 
-    int habilitadosIzq = nodo->izq ? nodo->izq->habilitados : 0;
-    int habilitadosDer = nodo->der ? nodo->der->habilitados : 0;
-    int deshabilitadosIzq = nodo->izq ? nodo->izq->deshabilitados : 0;
-    int deshabilitadosDer = nodo->der ? nodo->der->deshabilitados : 0;
+//     int habilitadosIzq = nodo->izq ? nodo->izq->habilitados : 0;
+//     int habilitadosDer = nodo->der ? nodo->der->habilitados : 0;
+//     int deshabilitadosIzq = nodo->izq ? nodo->izq->deshabilitados : 0;
+//     int deshabilitadosDer = nodo->der ? nodo->der->deshabilitados : 0;
 
-    nodo->habilitados = habilitadosIzq + habilitadosDer + (nodo->libro->habilitado ? 1 : 0);
-    nodo->deshabilitados = deshabilitadosIzq + deshabilitadosDer + (!nodo->libro->habilitado ? 1 : 0);
-}
+//     nodo->habilitados = habilitadosIzq + habilitadosDer + (nodo->libro->habilitado ? 1 : 0);
+//     nodo->deshabilitados = deshabilitadosIzq + deshabilitadosDer + (!nodo->libro->habilitado ? 1 : 0);
+// }
 
 // rotacionIzq y rotacionDer las saque de las slides de aulas (https://avl.uruguayan.ninja/8)
 
@@ -88,24 +87,29 @@ NodoAVL *rotacionDer(NodoAVL *y)
     return x;
 }
 
-NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro)
+NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int& habilitados, int& deshabilitados)
 {
     if (nodo == NULL)
-        return new NodoAVL(nuevoLibro);
+        habilitados++;
+    return new NodoAVL(nuevoLibro);
     if (nuevoLibro->id < nodo->libro->id)
     {
-        nodo->izq = add(nodo->izq, nuevoLibro);
+        nodo->izq = add(nodo->izq, nuevoLibro, habilitados, deshabilitados);
     }
     else if (nuevoLibro->id > nodo->libro->id)
     {
-        nodo->der = add(nodo->der, nuevoLibro);
+        nodo->der = add(nodo->der, nuevoLibro, habilitados, deshabilitados);
     }
     else
     {
         // Actualiza el libro existente
         nodo->libro->titulo = nuevoLibro->titulo;
+        if (!nodo->libro->habilitado)
+        {
+            habilitados++;
+            deshabilitados--
+        }
         nodo->libro->habilitado = true;
-        actualizarHabilitados(nodo);  // Actualizamos habilitados 
         return nodo;
     }
 
@@ -134,9 +138,6 @@ NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro)
         return rotacionIzq(nodo);
     }
 
-    // Actualizamos los habilitados/deshabilitados al finalizar la inserción
-    actualizarHabilitados(nodo);
-
     return nodo;
 }
 
@@ -163,39 +164,33 @@ Libro *findLibro(NodoAVL *nodo, int id)
     }
 }
 
-void toggle(NodoAVL *nodo, int id)
+void toggle(NodoAVL *nodo, int id, int &habilitados, int &deshabilitados)
 {
-    if (Libro *libro = findLibro(nodo, id))
+    Libro *libro = findLibro(nodo, id);
+    if (libro)
     {
         libro->habilitado = !libro->habilitado; // lo cambiamos de estado
-
-        NodoAVL *aux = nodo;
-
-        //hacemos esto para actualizar los nodos hasta llegar al nodo con su respectivo id, probablemente haya otra mejor forma pero explotaba todo y asi funciona :)
-
-        while (aux != NULL)
-        {
-            if (id < aux->libro->id)
-                aux = aux->izq;
-            else if (id > aux->libro->id)
-                aux = aux->der;
-            else
-                break;
-        }
-        actualizarHabilitados(aux); 
+    }
+    if (libro->habilitado)
+    {
+        habilitados++;
+        deshabilitados--;
+    }
+    else
+    {
+        deshabilitados++;
+        habilitados--;
     }
 }
 
-void count(NodoAVL *nodo)
+void count(NodoAVL *nodo, int habilitados, int deshabilitados)
 {
     if (!nodo)
     {
         cout << "0 0 0" << endl;
         return;
     }
-
-    actualizarHabilitados(nodo);
-    cout << nodo->habilitados + nodo->deshabilitados << " " << nodo->habilitados << " " << nodo->deshabilitados << endl;
+    cout << habilitados + deshabilitados << " " << habilitados << " " << deshabilitados << endl;
 }
 
 int extraerID(string &oracion, int inicio)
@@ -213,7 +208,17 @@ string extraerTitulo(const string &oracion, int inicio)
 
 int main()
 {
+    // // IMPORTANTE! BORRAR O COMENTAR LAS SIGUIENTES LINEAS  EN TODOS LOS EJERCICIOS DEL OBLIGATORIO. NO PUEDEN ESTAR EN NINGUNA ENTREGA!
+    // ifstream myFile("tests/ejercicio1/100.in.txt");
+    // cin.rdbuf(myFile.rdbuf());
+    // // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
+    // ofstream myFile2("100.mine.out.txt");
+    // cout.rdbuf(myFile2.rdbuf());
+
     NodoAVL *arbol = NULL;
+
+    int habilitados, deshabilitados;
+
     int n;
     cin >> n;
     cin.ignore(); // Ignorar el salto de línea, si le saco esto se rompe todo.
@@ -230,7 +235,7 @@ int main()
         case 'T':
         {
             int id = extraerID(oracion, 7);
-            toggle(arbol, id);
+            toggle(arbol, id, habilitados, deshabilitados);
             break;
         }
         case 'A':
@@ -239,7 +244,7 @@ int main()
             string titulo = extraerTitulo(oracion, 4);
             Libro *nuevoLibro = new Libro(id, titulo);
 
-            arbol = add(arbol, nuevoLibro);
+            arbol = add(arbol, nuevoLibro, habilitados, deshabilitados);
             break;
         }
         case 'F':
@@ -253,7 +258,7 @@ int main()
         }
         case 'C':
         {
-            count(arbol);
+            count(arbol, habilitados, deshabilitados);
             break;
         }
         default:
