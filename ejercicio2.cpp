@@ -71,24 +71,20 @@ public:
 
     void insertar(K clave, V valor)
     {
-        int pos = abs(funcionHash(clave)) % tamañoTabla;
-        int paso = 1 + (abs(funcionHash(clave)) % (tamañoTabla - 1));
-
-        while (tabla[pos] && !tabla[pos]->eliminado && tabla[pos]->clave != clave)
+        int posHash = abs(funcionHash(clave)) % tamañoTabla;
+        while (tabla[posHash] && !tabla[posHash]->eliminado)
         {
-            pos = (pos + paso) % tamañoTabla;
+            posHash = (posHash + 1) % tamañoTabla;
         }
-
-        if (tabla[pos])
+        if (tabla[posHash])
         {
-            delete tabla[pos]->valor; // Liberar el objeto Libro si se reemplaza
-            delete tabla[pos];
+            delete tabla[posHash];
         }
-        tabla[pos] = new NodoHash<K, V>(clave, valor);
+        tabla[posHash] = new NodoHash<K, V>(clave, valor);
         cantidad++;
     }
 
-    void Eliminar(K clave)
+    void eliminar(K clave)
     {
         int posHash = abs(funcionHash(clave)) % tamañoTabla;
         while (tabla[posHash]->clave != clave)
@@ -110,14 +106,12 @@ public:
 
     bool existe(K clave)
     {
-        int pos = abs(funcionHash(clave)) % tamañoTabla;
-        int paso = 1 + (abs(funcionHash(clave)) % (tamañoTabla - 1));
-
-        while (tabla[pos] && tabla[pos]->clave != clave)
+        int posHash = abs(funcionHash(clave)) % tamañoTabla;
+        while (tabla[posHash] && tabla[posHash]->clave != clave)
         {
-            pos = (pos + paso) % tamañoTabla;
+            posHash = (posHash + 1) % tamañoTabla;
         }
-        return tabla[pos] && !tabla[pos]->eliminado;
+        return tabla[posHash] && !tabla[posHash]->eliminado;
     }
 
     void count(int &habilitados, int &deshabilitados)
@@ -197,7 +191,9 @@ int main()
             {
                 Libro *libro = tabla->recuperar(id);
                 libro->habilitado = !libro->habilitado;
-            }else{
+            }
+            else
+            {
                 cout << "libro_no_encontrado" << endl;
             }
             break;
