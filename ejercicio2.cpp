@@ -29,14 +29,17 @@ private:
         {
             return false;
         }
-        for (int i = 2; i <= sqrt(num); i++)
+        else
         {
-            if (num % i == 0)
+            for (int i = 2; i < num / 2; i++)
             {
-                return false;
+                if (num % i == 0)
+                {
+                    return false;
+                }
             }
+            return true;
         }
-        return true;
     }
 
     int primoSup(int num)
@@ -59,8 +62,7 @@ public:
         {
             if (tabla[i] && !tabla[i]->eliminado)
             {
-                // No hay necesidad de liberar memoria si V no es un puntero
-                // delete tabla[i]->valor; // Solo si V es un puntero
+                delete tabla[i]->valor; // Liberar el objeto Libro
                 delete tabla[i];
             }
         }
@@ -79,8 +81,7 @@ public:
 
         if (tabla[pos])
         {
-            // No hay necesidad de liberar memoria si V no es un puntero
-            // delete tabla[pos]->valor; // Solo si V es un puntero
+            delete tabla[pos]->valor; // Liberar el objeto Libro si se reemplaza
             delete tabla[pos];
         }
         tabla[pos] = new NodoHash<K, V>(clave, valor);
@@ -90,14 +91,11 @@ public:
     void Eliminar(K clave)
     {
         int posHash = abs(funcionHash(clave)) % tamañoTabla;
-        while (tabla[posHash] && tabla[posHash]->clave != clave)
+        while (tabla[posHash]->clave != clave)
         {
             posHash = (posHash + 1) % tamañoTabla;
         }
-        if (tabla[posHash])
-        {
-            tabla[posHash]->eliminado = true;
-        }
+        tabla[posHash]->eliminado = true;
     }
 
     V recuperar(K clave)
@@ -131,7 +129,7 @@ public:
         {
             if (tabla[i] && !tabla[i]->eliminado)
             {
-                if (tabla[i]->valor.habilitado)
+                if (tabla[i]->valor->habilitado)
                 {
                     habilitados++;
                 }
@@ -146,7 +144,7 @@ public:
 
 int funcionHash(int id)
 {
-    return id % 1000003;
+    return id % 1000003; // Ejemplo de función hash para enteros
 }
 
 struct Libro
@@ -174,7 +172,7 @@ string extraerTitulo(const string &oracion, int inicio)
 int main()
 {
     int tamañoTabla = 1000003; // Tamaño de la tabla hash
-    Hash<int, Libro> *tabla = new Hash<int, Libro>(tamañoTabla, funcionHash);
+    Hash<int, Libro *> *tabla = new Hash<int, Libro *>(tamañoTabla, funcionHash);
 
     int habilitados = 0;
     int deshabilitados = 0;
@@ -197,9 +195,10 @@ int main()
             int id = extraerID(oracion, 7);
             if (tabla->existe(id))
             {
-                Libro libro = tabla->recuperar(id);
-                libro.habilitado = !libro.habilitado;
-                tabla->insertar(id, libro);
+                Libro *libro = tabla->recuperar(id);
+                libro->habilitado = !libro->habilitado;
+            }else{
+                cout << "libro_no_encontrado" << endl;
             }
             break;
         }
@@ -207,7 +206,7 @@ int main()
         {
             int id = extraerID(oracion, 4);
             string titulo = extraerTitulo(oracion, 4);
-            Libro nuevoLibro(id, titulo);
+            Libro *nuevoLibro = new Libro(id, titulo);
             tabla->insertar(id, nuevoLibro);
             break;
         }
@@ -216,8 +215,8 @@ int main()
             int id = extraerID(oracion, 5);
             if (tabla->existe(id))
             {
-                Libro libro = tabla->recuperar(id);
-                cout << libro.titulo << " " << (libro.habilitado ? "H" : "D") << endl;
+                Libro *libro = tabla->recuperar(id);
+                cout << libro->titulo << " " << (libro->habilitado ? "H" : "D") << endl;
             }
             else
             {
@@ -236,8 +235,6 @@ int main()
             break;
         }
     }
-
-    delete tabla; // Liberar la memoria asignada dinámicamente
 
     return 0;
 }
