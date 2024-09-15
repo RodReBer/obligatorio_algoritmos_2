@@ -10,12 +10,12 @@ class NodoHash {
         NodoHash(K clave, V valor) : clave(clave), valor(valor), susuki(false){}
 };
 
-
 template<class K, class V>
 class Hash {
     private:
         NodoHash<K,V>** hash;
         int cantidad;
+		
         int largoArray;
         int maxCant;
         int (*fHash)(K);
@@ -118,6 +118,7 @@ class Hash {
 };
 
 // Ref: https://cseweb.ucsd.edu/~kube/cls/100/Lectures/lec16/lec16-15.html
+
 int fHash(string key) {
   int h = 0;
   for (int i = 0; i < key.length(); i++)

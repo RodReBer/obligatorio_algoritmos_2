@@ -27,6 +27,7 @@ struct NodoAVL
     NodoAVL(Libro *libro) : libro(libro), izq(NULL), der(NULL), altura(0) {}
 };
 
+
 int alt(NodoAVL *nodo)
 {
     return nodo ? nodo->altura : 0;
