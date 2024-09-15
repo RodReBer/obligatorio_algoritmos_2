@@ -9,14 +9,13 @@ class ListImp : public List<T>
 {
 private:
     // define a inner class (Node) to be used by the double linked list
-    class Node
-    {
-    public:
-        T element;
-        Node *next;
-        Node *previous;
-        Node(T element, Node *next, Node *previous) : element(element), next(next), previous(previous) {}
-    };
+    class Node {
+        public:
+            T element;
+            Node *next;
+            Node *previous;
+            Node(T element, Node *next, Node *previous) : element(element), next(next), previous(previous) {}
+        };
 
     Node *head;
     Node *tail;

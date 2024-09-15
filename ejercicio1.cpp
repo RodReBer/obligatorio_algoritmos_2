@@ -27,7 +27,6 @@ struct NodoAVL
     NodoAVL(Libro *libro) : libro(libro), izq(NULL), der(NULL), altura(0) {}
 };
 
-
 int alt(NodoAVL *nodo)
 {
     return nodo ? nodo->altura : 0;
@@ -88,11 +87,13 @@ NodoAVL *rotacionDer(NodoAVL *y)
     return x;
 }
 
-NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int& habilitados, int& deshabilitados)
+NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int &habilitados, int &deshabilitados)
 {
     if (nodo == NULL)
+    {
         habilitados++;
-    return new NodoAVL(nuevoLibro);
+        return new NodoAVL(nuevoLibro);
+    }
     if (nuevoLibro->id < nodo->libro->id)
     {
         nodo->izq = add(nodo->izq, nuevoLibro, habilitados, deshabilitados);
@@ -108,7 +109,7 @@ NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int& habilitados, int& deshabilit
         if (!nodo->libro->habilitado)
         {
             habilitados++;
-            deshabilitados--
+            deshabilitados--;
         }
         nodo->libro->habilitado = true;
         return nodo;
@@ -142,55 +143,37 @@ NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int& habilitados, int& deshabilit
     return nodo;
 }
 
-Libro *findLibro(NodoAVL *nodo, int id)
-{
-    if (!nodo)
-    {
-        std::cout << "libro_no_encontrado" << std::endl;
-        return NULL;
+Libro *findLibro(NodoAVL *nodo, int id) {
+    while (nodo) {
+        if (nodo->libro->id == id) {
+            return nodo->libro;
+        }
+        if (id < nodo->libro->id) {
+            nodo = nodo->izq;
+        } else {
+            nodo = nodo->der;
+        }
     }
-
-    if (nodo->libro->id == id)
-    {
-        return nodo->libro;
-    }
-
-    if (id < nodo->libro->id)
-    {
-        return findLibro(nodo->izq, id);
-    }
-    else
-    {
-        return findLibro(nodo->der, id);
-    }
+    std::cout << "libro_no_encontrado" << std::endl;
+    return NULL;
 }
 
-void toggle(NodoAVL *nodo, int id, int &habilitados, int &deshabilitados)
-{
+
+void toggle(NodoAVL *nodo, int id, int &habilitados, int &deshabilitados) {
     Libro *libro = findLibro(nodo, id);
-    if (libro)
-    {
-        libro->habilitado = !libro->habilitado; // lo cambiamos de estado
-    }
-    if (libro->habilitado)
-    {
-        habilitados++;
-        deshabilitados--;
-    }
-    else
-    {
-        deshabilitados++;
-        habilitados--;
+    if (libro) {
+        if (libro->habilitado) {
+            habilitados--;
+            deshabilitados++;
+        } else {
+            habilitados++;
+            deshabilitados--;
+        }
+        libro->habilitado = !libro->habilitado;
     }
 }
 
-void count(NodoAVL *nodo, int habilitados, int deshabilitados)
-{
-    if (!nodo)
-    {
-        cout << "0 0 0" << endl;
-        return;
-    }
+void count(NodoAVL *nodo, int habilitados, int deshabilitados) {
     cout << habilitados + deshabilitados << " " << habilitados << " " << deshabilitados << endl;
 }
 
@@ -207,18 +190,29 @@ string extraerTitulo(const string &oracion, int inicio)
     return oracion.substr(pos + 1);
 }
 
+void liberarArbol(NodoAVL* nodo) {
+    if (nodo) {
+        liberarArbol(nodo->izq);
+        liberarArbol(nodo->der);
+        delete nodo->libro;
+        delete nodo;
+    }
+}
+
+
 int main()
 {
-    // // IMPORTANTE! BORRAR O COMENTAR LAS SIGUIENTES LINEAS  EN TODOS LOS EJERCICIOS DEL OBLIGATORIO. NO PUEDEN ESTAR EN NINGUNA ENTREGA!
-    // ifstream myFile("tests/ejercicio1/100.in.txt");
-    // cin.rdbuf(myFile.rdbuf());
-    // // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
-    // ofstream myFile2("100.mine.out.txt");
-    // cout.rdbuf(myFile2.rdbuf());
+    //  // IMPORTANTE! BORRAR O COMENTAR LAS SIGUIENTES LINEAS  EN TODOS LOS EJERCICIOS DEL OBLIGATORIO. NO PUEDEN ESTAR EN NINGUNA ENTREGA!
+    //  ifstream myFile("tests/ejercicio1/100.in.txt");
+    //  cin.rdbuf(myFile.rdbuf());
+    //  // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
+    //  ofstream myFile2("100.mine.out.txt");
+    //  cout.rdbuf(myFile2.rdbuf());
 
     NodoAVL *arbol = NULL;
 
-    int habilitados, deshabilitados;
+    int habilitados = 0;
+    int deshabilitados = 0;
 
     int n;
     cin >> n;
@@ -244,7 +238,6 @@ int main()
             int id = extraerID(oracion, 4);
             string titulo = extraerTitulo(oracion, 4);
             Libro *nuevoLibro = new Libro(id, titulo);
-
             arbol = add(arbol, nuevoLibro, habilitados, deshabilitados);
             break;
         }
@@ -267,5 +260,8 @@ int main()
             break;
         }
     }
+
+    liberarArbol(arbol);
+    
     return 0;
 }
