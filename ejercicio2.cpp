@@ -29,17 +29,14 @@ private:
         {
             return false;
         }
-        else
+        for (int i = 2; i <= sqrt(num); i++)
         {
-            for (int i = 2; i < num / 2; i++)
+            if (num % i == 0)
             {
-                if (num % i == 0)
-                {
-                    return false;
-                }
+                return false;
             }
-            return true;
         }
+        return true;
     }
 
     int primoSup(int num)
@@ -62,7 +59,8 @@ public:
         {
             if (tabla[i] && !tabla[i]->eliminado)
             {
-                delete tabla[i]->valor; // Liberar el objeto Libro
+                // No hay necesidad de liberar memoria si V no es un puntero
+                // delete tabla[i]->valor; // Solo si V es un puntero
                 delete tabla[i];
             }
         }
@@ -79,11 +77,10 @@ public:
             pos = (pos + paso) % tamañoTabla;
         }
 
-        // posicion libre
-
         if (tabla[pos])
         {
-            delete tabla[pos]->valor; // Liberar el objeto Libro si se reemplaza
+            // No hay necesidad de liberar memoria si V no es un puntero
+            // delete tabla[pos]->valor; // Solo si V es un puntero
             delete tabla[pos];
         }
         tabla[pos] = new NodoHash<K, V>(clave, valor);
@@ -93,11 +90,14 @@ public:
     void Eliminar(K clave)
     {
         int posHash = abs(funcionHash(clave)) % tamañoTabla;
-        while (tabla[posHash]->clave != clave)
+        while (tabla[posHash] && tabla[posHash]->clave != clave)
         {
             posHash = (posHash + 1) % tamañoTabla;
         }
-        tabla[posHash]->eliminado = true;
+        if (tabla[posHash])
+        {
+            tabla[posHash]->eliminado = true;
+        }
     }
 
     V recuperar(K clave)
@@ -122,7 +122,7 @@ public:
         return tabla[pos] && !tabla[pos]->eliminado;
     }
 
-void count(int &habilitados, int &deshabilitados)
+    void count(int &habilitados, int &deshabilitados)
     {
         habilitados = 0;
         deshabilitados = 0;
@@ -131,7 +131,7 @@ void count(int &habilitados, int &deshabilitados)
         {
             if (tabla[i] && !tabla[i]->eliminado)
             {
-                if (tabla[i]->valor->habilitado)
+                if (tabla[i]->valor.habilitado)
                 {
                     habilitados++;
                 }
@@ -174,7 +174,7 @@ string extraerTitulo(const string &oracion, int inicio)
 int main()
 {
     int tamañoTabla = 1000003; // Tamaño de la tabla hash
-    Hash<int, Libro *> tabla(tamañoTabla, funcionHash);
+    Hash<int, Libro> *tabla = new Hash<int, Libro>(tamañoTabla, funcionHash);
 
     int habilitados = 0;
     int deshabilitados = 0;
@@ -195,10 +195,11 @@ int main()
         case 'T':
         {
             int id = extraerID(oracion, 7);
-            if (tabla.existe(id))
+            if (tabla->existe(id))
             {
-                Libro *libro = tabla.recuperar(id);
-                libro->habilitado = !libro->habilitado;
+                Libro libro = tabla->recuperar(id);
+                libro.habilitado = !libro.habilitado;
+                tabla->insertar(id, libro);
             }
             break;
         }
@@ -206,17 +207,17 @@ int main()
         {
             int id = extraerID(oracion, 4);
             string titulo = extraerTitulo(oracion, 4);
-            Libro *nuevoLibro = new Libro(id, titulo);
-            tabla.insertar(id, nuevoLibro);
+            Libro nuevoLibro(id, titulo);
+            tabla->insertar(id, nuevoLibro);
             break;
         }
         case 'F':
         {
             int id = extraerID(oracion, 5);
-            if (tabla.existe(id))
+            if (tabla->existe(id))
             {
-                Libro *libro = tabla.recuperar(id);
-                cout << libro->titulo << " " << (libro->habilitado ? "H" : "D") << endl;
+                Libro libro = tabla->recuperar(id);
+                cout << libro.titulo << " " << (libro.habilitado ? "H" : "D") << endl;
             }
             else
             {
@@ -226,7 +227,7 @@ int main()
         }
         case 'C':
         {
-            tabla.count(habilitados, deshabilitados);
+            tabla->count(habilitados, deshabilitados);
             cout << habilitados + deshabilitados << " " << habilitados << " " << deshabilitados << endl;
             break;
         }
@@ -235,6 +236,8 @@ int main()
             break;
         }
     }
+
+    delete tabla; // Liberar la memoria asignada dinámicamente
 
     return 0;
 }
