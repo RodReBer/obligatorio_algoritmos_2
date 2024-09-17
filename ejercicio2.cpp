@@ -3,6 +3,22 @@
 #include <cmath>
 using namespace std;
 
+int hash3(string key)
+{
+    int h = 0;
+    for (int i = 0; i < key.length(); i++)
+        h = 31 * h + int(key[i]);
+    return h;
+}
+
+int hash2(string key)
+{
+    int h = 0;
+    for (int i = 0; i < key.length(); i++)
+        h = h + key[i] * (i + 1);
+    return h;
+}
+
 template <class K, class V>
 class NodoHash
 {
@@ -21,7 +37,6 @@ private:
     NodoHash<K, V> **tabla;
     int cantidad;
     int tamañoTabla;
-    int (*funcionHash)(K);
 
     bool esPrimo(int num)
     {
@@ -50,7 +65,7 @@ private:
     }
 
 public:
-    Hash(int maxCantidad, int (*fHash)(K)) : cantidad(0), funcionHash(fHash)
+    Hash(int maxCantidad) : cantidad(0)
     {
         tamañoTabla = primoSup(maxCantidad * 2);
         tabla = new NodoHash<K, V> *[tamañoTabla]();
@@ -71,11 +86,14 @@ public:
 
     void insertar(K clave, V valor)
     {
-        int posHash = abs(funcionHash(clave)) % tamañoTabla;
-        while (tabla[posHash] && !tabla[posHash]->eliminado)
+        int tryCount = 0; // Contador de intentos para el doble hashing
+        int posHash;
+        do
         {
-            posHash = (posHash + 1) % tamañoTabla;
-        }
+            posHash = (abs(hash3(to_string(clave)) + tryCount * hash2(to_string(clave)))) % tamañoTabla;
+            tryCount++;
+        } while (tabla[posHash] && !tabla[posHash]->eliminado);
+
         if (tabla[posHash])
         {
             delete tabla[posHash];
@@ -86,31 +104,40 @@ public:
 
     void eliminar(K clave)
     {
-        int posHash = abs(funcionHash(clave)) % tamañoTabla;
-        while (tabla[posHash]->clave != clave)
+        int tryCount = 0; // Contador de intentos para el doble hashing
+        int posHash;
+        do
         {
-            posHash = (posHash + 1) % tamañoTabla;
-        }
+            posHash = (abs(hash3(to_string(clave)) + tryCount * hash2(to_string(clave)))) % tamañoTabla;
+            tryCount++;
+        } while (tabla[posHash]->clave != clave);
+
         tabla[posHash]->eliminado = true;
     }
 
     V recuperar(K clave)
     {
-        int posHash = abs(funcionHash(clave)) % tamañoTabla;
-        while (tabla[posHash]->clave != clave)
+        int tryCount = 0; // Contador de intentos para el doble hashing
+        int posHash;
+        do
         {
-            posHash = (posHash + 1) % tamañoTabla;
-        }
+            posHash = (abs(hash3(to_string(clave)) + tryCount * hash2(to_string(clave)))) % tamañoTabla;
+            tryCount++;
+        } while (tabla[posHash]->clave != clave);
+
         return tabla[posHash]->valor;
     }
 
     bool existe(K clave)
     {
-        int posHash = abs(funcionHash(clave)) % tamañoTabla;
-        while (tabla[posHash] && tabla[posHash]->clave != clave)
+        int tryCount = 0; // Contador de intentos para el doble hashing
+        int posHash;
+        do
         {
-            posHash = (posHash + 1) % tamañoTabla;
-        }
+            posHash = (abs(hash3(to_string(clave)) + tryCount * hash2(to_string(clave)))) % tamañoTabla;
+            tryCount++;
+        } while (tabla[posHash] && tabla[posHash]->clave != clave);
+
         return tabla[posHash] && !tabla[posHash]->eliminado;
     }
 
@@ -135,11 +162,6 @@ public:
         }
     }
 };
-
-int funcionHash(int id)
-{
-    return id % 1000003; // Ejemplo de función hash para enteros
-}
 
 struct Libro
 {
@@ -166,7 +188,7 @@ string extraerTitulo(const string &oracion, int inicio)
 int main()
 {
     int tamañoTabla = 1000003; // Tamaño de la tabla hash
-    Hash<int, Libro *> *tabla = new Hash<int, Libro *>(tamañoTabla, funcionHash);
+    Hash<int, Libro *> *tabla = new Hash<int, Libro *>(tamañoTabla);
 
     int habilitados = 0;
     int deshabilitados = 0;
