@@ -202,12 +202,12 @@ void liberarArbol(NodoAVL* nodo) {
 
 int main()
 {
-    //  // IMPORTANTE! BORRAR O COMENTAR LAS SIGUIENTES LINEAS  EN TODOS LOS EJERCICIOS DEL OBLIGATORIO. NO PUEDEN ESTAR EN NINGUNA ENTREGA!
-    //  ifstream myFile("tests/ejercicio1/100.in.txt");
-    //  cin.rdbuf(myFile.rdbuf());
-    //  // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
-    //  ofstream myFile2("100.mine.out.txt");
-    //  cout.rdbuf(myFile2.rdbuf());
+    //    // IMPORTANTE! BORRAR O COMENTAR LAS SIGUIENTES LINEAS  EN TODOS LOS EJERCICIOS DEL OBLIGATORIO. NO PUEDEN ESTAR EN NINGUNA ENTREGA!
+    //    ifstream myFile("tests/ejercicio1/100000.in.txt");
+    //    cin.rdbuf(myFile.rdbuf());
+    //    // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
+    //    ofstream myFile2("100000.mine.out.txt");
+    //    cout.rdbuf(myFile2.rdbuf());
 
     NodoAVL *arbol = NULL;
 
