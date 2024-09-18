@@ -143,14 +143,20 @@ NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int &habilitados, int &deshabilit
     return nodo;
 }
 
-Libro *findLibro(NodoAVL *nodo, int id) {
-    while (nodo) {
-        if (nodo->libro->id == id) {
+Libro *findLibro(NodoAVL *nodo, int id)
+{
+    while (nodo)
+    {
+        if (nodo->libro->id == id)
+        {
             return nodo->libro;
         }
-        if (id < nodo->libro->id) {
+        if (id < nodo->libro->id)
+        {
             nodo = nodo->izq;
-        } else {
+        }
+        else
+        {
             nodo = nodo->der;
         }
     }
@@ -158,14 +164,18 @@ Libro *findLibro(NodoAVL *nodo, int id) {
     return NULL;
 }
 
-
-void toggle(NodoAVL *nodo, int id, int &habilitados, int &deshabilitados) {
+void toggle(NodoAVL *nodo, int id, int &habilitados, int &deshabilitados)
+{
     Libro *libro = findLibro(nodo, id);
-    if (libro) {
-        if (libro->habilitado) {
+    if (libro)
+    {
+        if (libro->habilitado)
+        {
             habilitados--;
             deshabilitados++;
-        } else {
+        }
+        else
+        {
             habilitados++;
             deshabilitados--;
         }
@@ -173,95 +183,76 @@ void toggle(NodoAVL *nodo, int id, int &habilitados, int &deshabilitados) {
     }
 }
 
-void count(NodoAVL *nodo, int habilitados, int deshabilitados) {
+void count(NodoAVL *nodo, int habilitados, int deshabilitados)
+{
     cout << habilitados + deshabilitados << " " << habilitados << " " << deshabilitados << endl;
 }
 
-int extraerID(string &oracion, int inicio)
+void liberarMemoria(NodoAVL *nodo)
 {
-    int pos = oracion.find(' ', inicio);
-    string idStr = oracion.substr(inicio, pos - inicio);
-    return stoi(idStr); // el stoi es como un parseInt pero en C++
-}
+    if (nodo == NULL)
+        return;
 
-string extraerTitulo(const string &oracion, int inicio)
-{
-    int pos = oracion.find(' ', inicio);
-    return oracion.substr(pos + 1);
-}
+    liberarMemoria(nodo->izq);
+    liberarMemoria(nodo->der);
 
-void liberarArbol(NodoAVL* nodo) {
-    if (nodo) {
-        liberarArbol(nodo->izq);
-        liberarArbol(nodo->der);
-        delete nodo->libro;
-        delete nodo;
-    }
+    delete nodo->libro;
+    delete nodo;
 }
-
 
 int main()
 {
-    //  // IMPORTANTE! BORRAR O COMENTAR LAS SIGUIENTES LINEAS  EN TODOS LOS EJERCICIOS DEL OBLIGATORIO. NO PUEDEN ESTAR EN NINGUNA ENTREGA!
-    //  ifstream myFile("tests/ejercicio1/100.in.txt");
-    //  cin.rdbuf(myFile.rdbuf());
-    //  // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
-    //  ofstream myFile2("100.mine.out.txt");
-    //  cout.rdbuf(myFile2.rdbuf());
-
     NodoAVL *arbol = NULL;
-
     int habilitados = 0;
     int deshabilitados = 0;
 
     int n;
     cin >> n;
-    cin.ignore(); // Ignorar el salto de línea, si le saco esto se rompe todo.
+    cin.ignore(); // Ignorar el salto de línea después del número
 
     for (int i = 0; i < n; i++)
     {
-        string oracion;
-        getline(cin, oracion);
+        string funcion;
+        cin >> funcion;
 
-        char opcion = oracion[0];
+        if (funcion == "ADD")
+        {
+            int id;
+            string titulo;
+            cin >> id;
+            cin.ignore();
+            getline(cin, titulo);
 
-        switch (opcion)
-        {
-        case 'T':
-        {
-            int id = extraerID(oracion, 7);
-            toggle(arbol, id, habilitados, deshabilitados);
-            break;
-        }
-        case 'A':
-        {
-            int id = extraerID(oracion, 4);
-            string titulo = extraerTitulo(oracion, 4);
             Libro *nuevoLibro = new Libro(id, titulo);
             arbol = add(arbol, nuevoLibro, habilitados, deshabilitados);
-            break;
         }
-        case 'F':
+        else if (funcion == "TOGGLE")
         {
-            int id = extraerID(oracion, 5);
+            int id;
+            cin >> id;
+            
+            toggle(arbol, id, habilitados, deshabilitados);
+        }
+        else if (funcion == "FIND")
+        {
+            int id;
+            cin >> id;
             if (Libro *libro = findLibro(arbol, id))
             {
                 cout << libro->titulo << " " << (libro->habilitado ? "H" : "D") << endl;
             }
-            break;
         }
-        case 'C':
+        else if (funcion == "COUNT")
         {
             count(arbol, habilitados, deshabilitados);
-            break;
         }
-        default:
-            cout << "OPCION INVALIDA |  1891 " << endl;
-            break;
+        else
+        {
+            cout << "OPCION INVALIDA | 1891" << endl;
         }
     }
 
-    liberarArbol(arbol);
-    
+    liberarMemoria(arbol);
+
     return 0;
 }
