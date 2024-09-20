@@ -195,6 +195,13 @@ void liberarMemoria(NodoAVL *nodo)
 
 int main()
 {
+
+    ifstream myFile("../tests/ejercicio2/100.in.txt");
+    cin.rdbuf(myFile.rdbuf());
+    // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
+    ofstream myFile2("../tests/ejercicio2/100.mine.txt");
+    cout.rdbuf(myFile2.rdbuf());
+
     NodoAVL *arbol = NULL;
     int habilitados = 0;
     int deshabilitados = 0;
