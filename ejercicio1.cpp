@@ -37,22 +37,6 @@ int obtenerBalance(NodoAVL *nodo)
     return nodo ? alt(nodo->izq) - alt(nodo->der) : 0;
 }
 
-// void actualizarHabilitados(NodoAVL *nodo)
-// {
-//     if (!nodo)
-//         return;
-
-//     int habilitadosIzq = nodo->izq ? nodo->izq->habilitados : 0;
-//     int habilitadosDer = nodo->der ? nodo->der->habilitados : 0;
-//     int deshabilitadosIzq = nodo->izq ? nodo->izq->deshabilitados : 0;
-//     int deshabilitadosDer = nodo->der ? nodo->der->deshabilitados : 0;
-
-//     nodo->habilitados = habilitadosIzq + habilitadosDer + (nodo->libro->habilitado ? 1 : 0);
-//     nodo->deshabilitados = deshabilitadosIzq + deshabilitadosDer + (!nodo->libro->habilitado ? 1 : 0);
-// }
-
-// rotacionIzq y rotacionDer las saque de las slides de aulas (https://avl.uruguayan.ninja/8)
-
 NodoAVL *rotacionIzq(NodoAVL *x)
 {
     NodoAVL *y = x->der;
@@ -87,8 +71,11 @@ NodoAVL *rotacionDer(NodoAVL *y)
     return x;
 }
 
+// extraido desde las ppt de aulas (https://avl.uruguayan.ninja/7)
+
 NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int &habilitados, int &deshabilitados)
 {
+    /* 1. Perform the normal BST insertion */
     if (nodo == NULL)
     {
         habilitados++;
@@ -115,31 +102,37 @@ NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int &habilitados, int &deshabilit
         return nodo;
     }
 
-    // Actualizar la altura
+    /* 2. Update height of this ancestor node */
     nodo->altura = 1 + std::max(alt(nodo->izq), alt(nodo->der));
 
-    // Verificamos el balance
+    /* 3. Get the balance factor of this ancestor node to check whether this node became unbalanced */
     int balance = obtenerBalance(nodo);
 
-    // Rotamos el árbol está desbalanceado
+    // If this node becomes unbalanced, then there are 4 cases
+
+    // Left Left Case
     if (balance > 1 && nuevoLibro->id < nodo->izq->libro->id)
         return rotacionDer(nodo);
 
-    if (balance < -1 && nuevoLibro->id > nodo->libro->id)
+    // Right Right Case
+    if (balance < -1 && nuevoLibro->id > nodo->der->libro->id)
         return rotacionIzq(nodo);
 
+    // Left Right Case
     if (balance > 1 && nuevoLibro->id > nodo->izq->libro->id)
     {
         nodo->izq = rotacionIzq(nodo->izq);
         return rotacionDer(nodo);
     }
 
+    // Right Left Case
     if (balance < -1 && nuevoLibro->id < nodo->der->libro->id)
     {
         nodo->der = rotacionDer(nodo->der);
         return rotacionIzq(nodo);
     }
 
+    /* return the (unchanged) node pointer */
     return nodo;
 }
 
@@ -237,7 +230,7 @@ int main()
         {
             int id;
             cin >> id;
-            
+
             toggle(arbol, id, habilitados, deshabilitados);
         }
         else if (funcion == "FIND")
@@ -259,7 +252,7 @@ int main()
         }
     }
 
-    liberarMemoria(arbol);
+    liberarMemoria(arbol); // buena practica pa
 
     return 0;
 }
