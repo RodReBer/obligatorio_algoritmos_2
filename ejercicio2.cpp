@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <fstream>
+
 using namespace std;
 
 int hash3(string key)
@@ -187,6 +189,13 @@ string extraerTitulo(const string &oracion, int inicio)
 
 int main()
 {
+
+    ifstream myFile("tests/ejercicio2/100.in.txt");
+    cin.rdbuf(myFile.rdbuf());
+    // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
+    ofstream myFile2("tests/ejercicio2/100.mine.txt");
+    cout.rdbuf(myFile2.rdbuf());
+
     int tamañoTabla = 1000003; // Tamaño de la tabla hash
     Hash<int, Libro *> *tabla = new Hash<int, Libro *>(tamañoTabla);
 

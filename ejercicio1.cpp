@@ -195,12 +195,21 @@ void liberarMemoria(NodoAVL *nodo)
 
 int main()
 {
+<<<<<<< HEAD
     //  // IMPORTANTE! BORRAR O COMENTAR LAS SIGUIENTES LINEAS  EN TODOS LOS EJERCICIOS DEL OBLIGATORIO. NO PUEDEN ESTAR EN NINGUNA ENTREGA!
     //  ifstream myFile("tests/ejercicio1/100.in.txt");
     //  cin.rdbuf(myFile.rdbuf());
     //  // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
     //  ofstream myFile2("100.mine.out.txt");
     //  cout.rdbuf(myFile2.rdbuf());
+=======
+
+    ifstream myFile("../tests/ejercicio2/100.in.txt");
+    cin.rdbuf(myFile.rdbuf());
+    // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
+    ofstream myFile2("../tests/ejercicio2/100.mine.txt");
+    cout.rdbuf(myFile2.rdbuf());
+>>>>>>> 075f4e0e68b355843abad4be985cc01c6e8113d1
 
     NodoAVL *arbol = NULL;
     int habilitados = 0;
