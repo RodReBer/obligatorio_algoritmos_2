@@ -38,9 +38,11 @@ int main() {
 
     // K objetos más baratos
     for (int i = 0; i < K; i++) {
-        int id = heap.ObtenerMin();
-        cout << id << endl;
-        heap.BorrarMin();
+        if (!heap.EsVacia()) {
+            int id = heap.ObtenerMin();  
+            cout << id << endl;          
+            heap.BorrarMin();          
+        }
     }
 
     return 0;
