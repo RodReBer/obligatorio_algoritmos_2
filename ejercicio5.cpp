@@ -5,6 +5,8 @@
 
 using namespace std;
 
+
+
 int main()
 {
     cin >> m;
@@ -13,6 +15,8 @@ int main()
     {
         cin >> idMision;
         cin >> nombreMision;
+
+        
     }
 
     cin >> c;
@@ -23,6 +27,8 @@ int main()
         cin >> idCiudad;
         cin >> nombreCiudad;
 
+
+
     }
 
     cin >> e;
@@ -32,6 +38,8 @@ int main()
         cin >> idCiudadOrigen;
         cin >> idCiudadDestino;
         cin >> tiempoDesplazamiento;
+
+
     }
     return 0;
 }

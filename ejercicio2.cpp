@@ -39,6 +39,8 @@ private:
     NodoHash<K, V> **tabla;
     int cantidad;
     int tamañoTabla;
+    int habilitados;
+    int deshabilitados;
 
     bool esPrimo(int num)
     {
@@ -46,17 +48,14 @@ private:
         {
             return false;
         }
-        else
+        for (int i = 2; i <= sqrt(num); i++)
         {
-            for (int i = 2; i < num / 2; i++)
+            if (num % i == 0)
             {
-                if (num % i == 0)
-                {
-                    return false;
-                }
+                return false;
             }
-            return true;
         }
+        return true;
     }
 
     int primoSup(int num)
@@ -67,7 +66,7 @@ private:
     }
 
 public:
-    Hash(int maxCantidad) : cantidad(0)
+    Hash(int maxCantidad) : cantidad(0), habilitados(0), deshabilitados(0)
     {
         tamañoTabla = primoSup(maxCantidad * 2);
         tabla = new NodoHash<K, V> *[tamañoTabla]();
@@ -96,11 +95,8 @@ public:
             tryCount++;
         } while (tabla[posHash] && !tabla[posHash]->eliminado);
 
-        if (tabla[posHash])
-        {
-            delete tabla[posHash];
-        }
         tabla[posHash] = new NodoHash<K, V>(clave, valor);
+        habilitados++;
         cantidad++;
     }
 
@@ -112,9 +108,22 @@ public:
         {
             posHash = (abs(hash3(to_string(clave)) + tryCount * hash2(to_string(clave)))) % tamañoTabla;
             tryCount++;
-        } while (tabla[posHash]->clave != clave);
+        } while (tabla[posHash] && tabla[posHash]->clave != clave);
 
-        tabla[posHash]->eliminado = true;
+        if (tabla[posHash])
+        {
+            if (tabla[posHash]->valor->habilitado)
+            {
+                habilitados--;
+            }
+            else
+            {
+                deshabilitados--;
+            }
+
+            tabla[posHash]->eliminado = true;
+            cantidad--;
+        }
     }
 
     V recuperar(K clave)
@@ -125,7 +134,7 @@ public:
         {
             posHash = (abs(hash3(to_string(clave)) + tryCount * hash2(to_string(clave)))) % tamañoTabla;
             tryCount++;
-        } while (tabla[posHash]->clave != clave);
+        } while (tabla[posHash] && tabla[posHash]->clave != clave);
 
         return tabla[posHash]->valor;
     }
@@ -143,25 +152,58 @@ public:
         return tabla[posHash] && !tabla[posHash]->eliminado;
     }
 
-    void count(int &habilitados, int &deshabilitados)
+    void toggle(K clave)
     {
-        habilitados = 0;
-        deshabilitados = 0;
-
-        for (int i = 0; i < tamañoTabla; i++)
+        if (existe(clave))
         {
-            if (tabla[i] && !tabla[i]->eliminado)
+            V libro = recuperar(clave);
+            libro->habilitado = !libro->habilitado;
+
+            if (libro->habilitado)
             {
-                if (tabla[i]->valor->habilitado)
-                {
-                    habilitados++;
-                }
-                else
-                {
-                    deshabilitados++;
-                }
+                habilitados++;
+                deshabilitados--;
+            }
+            else
+            {
+                habilitados--;
+                deshabilitados++;
             }
         }
+        else
+        {
+            cout << "libro_no_encontrado" << endl;
+        }
+    }
+
+    int getHabilitados()
+    {
+        return habilitados;
+    }
+
+    int getDeshabilitados()
+    {
+        return deshabilitados;
+    }
+
+    int incrementarHabilitados()
+    {
+        return habilitados++;
+    }
+
+    int decrementarHabilitados()
+    {
+        return habilitados--;
+    }
+
+    int incrementarDeshabilitados()
+    {
+        return deshabilitados++;
+    }
+
+    int decrementarDeshabilitados()
+    {
+        return deshabilitados--;
     }
 };
 
@@ -189,18 +231,13 @@ string extraerTitulo(const string &oracion, int inicio)
 
 int main()
 {
-
-    ifstream myFile("tests/ejercicio2/100.in.txt");
-    cin.rdbuf(myFile.rdbuf());
-    // Si desean tirar la salida a un archivo, usen las siguientes líneas (si no, sáquenlas):
-    ofstream myFile2("tests/ejercicio2/100.mine.txt");
-    cout.rdbuf(myFile2.rdbuf());
+    // ifstream myFile("tests/ejercicio2/100.in.txt");
+    // cin.rdbuf(myFile.rdbuf());
+    // ofstream myFile2("tests/ejercicio2/100.mine.txt");
+    // cout.rdbuf(myFile2.rdbuf());
 
     int tamañoTabla = 1000003; // Tamaño de la tabla hash
     Hash<int, Libro *> *tabla = new Hash<int, Libro *>(tamañoTabla);
-
-    int habilitados = 0;
-    int deshabilitados = 0;
 
     int n;
     cin >> n;
@@ -222,6 +259,17 @@ int main()
             {
                 Libro *libro = tabla->recuperar(id);
                 libro->habilitado = !libro->habilitado;
+
+                if (libro->habilitado)
+                {
+                    tabla->incrementarHabilitados();
+                    tabla->decrementarDeshabilitados();
+                }
+                else
+                {
+                    tabla->incrementarDeshabilitados();
+                    tabla->decrementarHabilitados();
+                }
             }
             else
             {
@@ -234,6 +282,10 @@ int main()
             int id = extraerID(oracion, 4);
             string titulo = extraerTitulo(oracion, 4);
             Libro *nuevoLibro = new Libro(id, titulo);
+            if (tabla->existe(id))
+            {
+               tabla->eliminar(id);
+            }
             tabla->insertar(id, nuevoLibro);
             break;
         }
@@ -253,15 +305,17 @@ int main()
         }
         case 'C':
         {
-            tabla->count(habilitados, deshabilitados);
-            cout << habilitados + deshabilitados << " " << habilitados << " " << deshabilitados << endl;
+            cout << tabla->getHabilitados() + tabla->getDeshabilitados() << " "
+                 << tabla->getHabilitados() << " "
+                 << tabla->getDeshabilitados() << endl;
             break;
         }
         default:
-            cout << "OPCION INVALIDA" << endl;
+            cout << "OPCION INVALIDA | 1891" << endl;
             break;
         }
     }
 
+    delete tabla; // Liberar la memoria de la tabla hash
     return 0;
 }
