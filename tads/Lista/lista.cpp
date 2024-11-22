@@ -37,8 +37,7 @@ class Lista {
                 nodo = NULL;
             }
         }
-
-
+        
     public:
         Lista(): ppio(NULL), fin(NULL), largo(0){};
 
