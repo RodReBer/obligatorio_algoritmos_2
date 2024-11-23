@@ -12,7 +12,6 @@ int main() {
     int N, K;
     cin >> N;
 
-
     const int MAX_ID = 999999;  // límite máximo para los ids
     int precioPorId[MAX_ID];   
     for (int i = 0; i < MAX_ID; i++) {
