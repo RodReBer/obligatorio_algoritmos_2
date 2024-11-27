@@ -30,13 +30,13 @@ int main()
     int ****dp = new int ***[J + 1];
     for (int j = 0; j <= J; j++)
     {
-        dp[j] = new int **[K + 1];
+        dp[j] = new int **[K + 1]; // K jugadores seleccionados
         for (int k = 0; k <= K; k++)
         {
-            dp[j][k] = new int *[P + 1];
+            dp[j][k] = new int *[P + 1]; // P dinero disponible
             for (int p = 0; p <= P; p++)
             {
-                dp[j][k][p] = new int[E + 1];
+                dp[j][k][p] = new int[E + 1]; // E extranjeros seleccionados
                 for (int e = 0; e <= E; e++)
                 {
                     dp[j][k][p][e] = -1; // Inicializar manualmente con -1 (valor imposible)
@@ -51,8 +51,7 @@ int main()
     // Programación dinámica
     for (int j = 1; j <= J; j++)
     {
-        int valoracion = calcularValoracion(ritmo[j - 1], tiro[j - 1], pase[j - 1], regate[j - 1],
-                                            defensa[j - 1], fisico[j - 1], forma[j - 1], confianza[j - 1]);
+        int valoracion = calcularValoracion(ritmo[j - 1], tiro[j - 1], pase[j - 1], regate[j - 1], defensa[j - 1], fisico[j - 1], forma[j - 1], confianza[j - 1]);
         int costo = sueldo[j - 1];
         int esExtranjero = (extranjero[j - 1] == "Si");
 
@@ -71,8 +70,7 @@ int main()
                     // Caso incluyendo al jugador
                     if (k > 0 && p >= costo && e >= esExtranjero && dp[j - 1][k - 1][p - costo][e - esExtranjero] != -1)
                     {
-                        dp[j][k][p][e] = max(dp[j][k][p][e],
-                                             dp[j - 1][k - 1][p - costo][e - esExtranjero] + valoracion);
+                        dp[j][k][p][e] = max(dp[j][k][p][e], dp[j - 1][k - 1][p - costo][e - esExtranjero] + valoracion);
                     }
                 }
             }

@@ -152,8 +152,8 @@ int main()
     int costoTotalA = costoA3;
 
     // Restaurar costos
-    restaurarCostos(grafo, ant[0], equipo - 1);
-    restaurarCostos(grafo, ant[1], entidad - 1);
+    restaurarCostos(grafo, ant[0], entidad - 1);
+    restaurarCostos(grafo, ant[1], equipo - 1);
 
     // Calcular la segunda opción de ruta y costos totales
     grafo->dijkstra(start - 1, dist[3], ant[3], grafo);
@@ -168,21 +168,31 @@ int main()
     int costoB3 = costoB2 + dist[5][extraccion - 1];
     int costoTotalB = costoB3;
 
+    // Restaurar costos
+
+
+
     // Comparar y decidir la mejor opción
     // Decisión sobre la mejor ruta
-    (costoTotalA <= costoTotalB) ?
-        (cout << "BE11, la mejor ruta es Desactivar la Entidad, buscar equipo y punto de extraccion con un costo de " << costoTotalA << endl,
-         cout << "La otra opcion tiene un costo de " << costoTotalB << endl,
-         cout << "Paso 1: ", grafo->imprimirCamino(ant[0], entidad - 1, grafo), cout << " -> Desactivar la Entidad" << endl,
-         cout << "Paso 2: ", grafo->imprimirCamino(ant[1], equipo - 1, grafo), cout << " -> Buscar equipo" << endl,
-         cout << "Paso 3: ", grafo->imprimirCamino(ant[2], extraccion - 1, grafo), cout << " -> Ir a Punto de extraccion" << endl)
+    (costoTotalA <= costoTotalB) ? (
+        cout << "BE11, la mejor ruta es Desactivar la Entidad, buscar equipo y punto de extraccion con un costo de " << costoTotalA << endl, 
+        cout << "La otra opcion tiene un costo de " << costoTotalB << endl, 
+        cout << "Paso 1: ", grafo->imprimirCamino(ant[0], entidad - 1, grafo), 
+        cout << " -> Desactivar la Entidad" << endl, 
+        cout << "Paso 2: ", grafo->imprimirCamino(ant[1], equipo - 1, grafo), 
+        cout << " -> Buscar equipo" << endl, 
+        cout << "Paso 3: ", grafo->imprimirCamino(ant[2], extraccion - 1, grafo), 
+        cout << " -> Ir a Punto de extraccion" << endl)
                                  :
                                  // Si la segunda opción es mejor
         (cout << "BE11, la mejor ruta es Buscar equipo, Desactivar la Entidad y punto de extraccion con un costo de " << costoTotalB << endl,
          cout << "La otra opcion tiene un costo de " << costoTotalA << endl,
-         cout << "Paso 1: ", grafo->imprimirCamino(ant[3], equipo - 1, grafo), cout << " -> Buscar equipo" << endl,
-         cout << "Paso 2: ", grafo->imprimirCamino(ant[4], entidad - 1, grafo), cout << " -> Desactivar la Entidad" << endl,
-         cout << "Paso 3: ", grafo->imprimirCamino(ant[5], extraccion - 1, grafo), cout << " -> Ir a Punto de extraccion" << endl);
+         cout << "Paso 1: ", grafo->imprimirCamino(ant[3], equipo - 1, grafo), 
+         cout << " -> Buscar equipo" << endl,
+         cout << "Paso 2: ", grafo->imprimirCamino(ant[4], entidad - 1, grafo), 
+         cout << " -> Desactivar la Entidad" << endl,
+         cout << "Paso 3: ", grafo->imprimirCamino(ant[5], extraccion - 1, grafo), 
+         cout << " -> Ir a Punto de extraccion" << endl);
 
     delete grafo; // Liberar memoria
 
