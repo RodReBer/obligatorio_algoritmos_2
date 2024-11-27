@@ -5,30 +5,9 @@
 #include <cmath>
 #include <fstream>
 #include "tads/HashEj2/hashEj2.cpp"
+#include "funciones/ejercicio2.cpp"
 
 using namespace std;
-
-struct Libro
-{
-    int id;
-    string titulo;
-    bool habilitado;
-
-    Libro(int id, string titulo) : id(id), titulo(titulo), habilitado(true) {}
-};
-
-int extraerID(const string &oracion, int inicio)
-{
-    int pos = oracion.find(' ', inicio);
-    string idStr = oracion.substr(inicio, pos - inicio);
-    return stoi(idStr);
-}
-
-string extraerTitulo(const string &oracion, int inicio)
-{
-    int pos = oracion.find(' ', inicio);
-    return oracion.substr(pos + 1);
-}
 
 int main()
 {
