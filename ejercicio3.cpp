@@ -1,50 +1,105 @@
-//Rodrigo Rey y Román Ferrero
-//Estructura de datos y algoritmos 2
-#include <cassert>
-#include <string>
+// Rodrigo Rey y Román Ferrero
+// Estructura de datos y algoritmos 2
 #include <iostream>
-#include <limits>
-#include "tads/heap.cpp"
-
+#include <cstring>
 using namespace std;
 
+// Estructura para representar un objeto
+struct Objeto {
+    int id;
+    int precio;
+};
+
+// Función para intercambiar dos objetos
+void intercambiar(Objeto &a, Objeto &b) {
+    Objeto temp = a;
+    a = b;
+    b = temp;
+}
+
+// Implementación de Quicksort
+void quicksort(Objeto arr[], int low, int high) {
+    if (low < high) {
+        int pivot = arr[high].precio;  // Elegimos el último elemento como pivote
+        int i = low - 1;
+        for (int j = low; j < high; ++j) {
+            // Comparar por precio y, en caso de empate, por id descendente
+            if (arr[j].precio < pivot || 
+                (arr[j].precio == pivot && arr[j].id > arr[high].id)) {
+                ++i;
+                intercambiar(arr[i], arr[j]);
+            }
+        }
+        intercambiar(arr[i + 1], arr[high]);
+        int pi = i + 1;
+
+        quicksort(arr, low, pi - 1);
+        quicksort(arr, pi + 1, high);
+    }
+}
+
 int main() {
-    int N, K;
+    int N;
     cin >> N;
 
-    const int MAX_ID = 999999;  // límite máximo para los ids
-    int precioPorId[MAX_ID];   
-    for (int i = 0; i < MAX_ID; i++) {
-        precioPorId[i] = -1; 
+    // Leer todos los objetos usando memoria dinámica
+    Objeto* objetos = new Objeto[N];
+    for (int i = 0; i < N; ++i) {
+        cin >> objetos[i].id >> objetos[i].precio;
     }
 
-    for (int i = 0; i < N; i++) {
-        int id, precio;
-        cin >> id >> precio;
-
-        if (precioPorId[id] == -1 || precio < precioPorId[id]) {
-            precioPorId[id] = precio;
-        }
-    }
-
+    int K;
     cin >> K;
 
-    Heap<int> heap(N);
-
-    for (int id = 0; id < MAX_ID; id++) {
-        if (precioPorId[id] != -1) {  // los ids válidos
-            heap.Insertar(precioPorId[id], id);
+    // Encontrar el máximo id
+    int max_id = 0;
+    for (int i = 0; i < N; ++i) {
+        if (objetos[i].id > max_id) {
+            max_id = objetos[i].id;
         }
     }
 
-    // K objetos más baratos
-    for (int i = 0; i < K; i++) {
-        if (!heap.EsVacia()) {
-            int id = heap.ObtenerMin();  
-            cout << id << endl;          
-            heap.BorrarMin();          
+    // Arreglo para almacenar el menor precio por id
+    int* precios_min = new int[max_id + 1];
+    memset(precios_min, -1, (max_id + 1) * sizeof(int));  // Inicializamos con -1
+
+    // Registrar el menor precio para cada id
+    for (int i = 0; i < N; ++i) {
+        int id = objetos[i].id;
+        int precio = objetos[i].precio;
+
+        if (precios_min[id] == -1 || precio < precios_min[id]) {
+            precios_min[id] = precio;
+        } else if (precio == precios_min[id] && objetos[i].id > id) {
+            precios_min[id] = precio;  // Mantener id más grande en caso de empate
         }
     }
+
+    // Crear un nuevo arreglo con objetos únicos
+    Objeto* unicos = new Objeto[max_id]; // Max posibles objetos únicos
+    int count = 0;
+    for (int i = 1; i <= max_id; ++i) {
+        if (precios_min[i] != -1) {
+            unicos[count].id = i;
+            unicos[count].precio = precios_min[i];
+            ++count;
+        }
+    }
+
+    // Liberar memoria no utilizada
+    delete[] precios_min;
+    delete[] objetos;
+
+    // Ordenar los objetos únicos por precio ascendente y luego por id descendente
+    quicksort(unicos, 0, count - 1);
+
+    // Mostrar los K más baratos
+    for (int i = 0; i < K; ++i) {
+        cout << unicos[i].id << endl;
+    }
+
+    // Liberar memoria dinámica
+    delete[] unicos;
 
     return 0;
 }
