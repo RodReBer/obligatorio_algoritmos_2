@@ -1,7 +1,6 @@
 // Rodrigo Rey y Román Ferrero
 // Estructura de datos y algoritmos 2
 #include <iostream>
-#include <cstring>
 using namespace std;
 
 // Estructura para representar un objeto
@@ -61,7 +60,10 @@ int main() {
 
     // Arreglo para almacenar el menor precio por id
     int* precios_min = new int[max_id + 1];
-    memset(precios_min, -1, (max_id + 1) * sizeof(int));  // Inicializamos con -1
+    // Inicializar manualmente con -1
+    for (int i = 0; i <= max_id; ++i) {
+        precios_min[i] = -1;
+    }
 
     // Registrar el menor precio para cada id
     for (int i = 0; i < N; ++i) {
