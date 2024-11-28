@@ -3,7 +3,7 @@
 #include <limits>
 
 using namespace std;
-
+//el input mas grande que le puede venir
 const int MAX_PEDIDOS = 100000;
 
 struct Pedido {
@@ -16,7 +16,7 @@ struct Pedido {
 class TablaPedidos {
 private:
     struct Nodo {
-        string clave; // Cambié a string
+        string clave; 
         int valor;
         Nodo* siguiente;
     };
@@ -24,7 +24,7 @@ private:
     Nodo* tabla[MAX_PEDIDOS];
     int capacidad;
 
-    // Usamos la función hash2
+    //la vimos en clase
     int hash2(string clave) {
         int h = 0;
         for (int i = 0; i < clave.length(); i++)
@@ -40,8 +40,8 @@ public:
         }
     }
 
-    void insertar(string clave, int valor) {  // Modificado a string
-        int indice = hash2(clave) % capacidad;  // Usando hash2
+    void insertar(string clave, int valor) {  
+        int indice = hash2(clave) % capacidad;  
         Nodo* nuevo = new Nodo;
         nuevo->clave = clave;
         nuevo->valor = valor;
@@ -100,7 +100,7 @@ private:
         tabla->insertar(to_string(pedidos[j].id), j);  // Usando string como clave
     }
 
-    bool compararPedidos(const Pedido& a, const Pedido& b) {
+    bool compararPedidos(Pedido& a, Pedido& b) {
         if (a.prioridad != b.prioridad) {
             return a.prioridad < b.prioridad;
         }
