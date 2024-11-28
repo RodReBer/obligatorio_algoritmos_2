@@ -49,7 +49,6 @@ int main()
             listaIdMisiones.InsertarFin(dependencia);
             cin >> dependencia;
         }
-
     }
 
     cin >> c; // ciudades
@@ -78,5 +77,10 @@ int main()
         cin >> idCiudadDestino;
         cin >> tiempoDesplazamiento;
     }
+
+ 
+    Lista<int> *ordenTopologico = grafoMisiones->OrdenTopologico();
+
+
     return 0;
 }
