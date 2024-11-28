@@ -1,93 +1,76 @@
-// Rodrigo Rey y Román Ferrero
-// Estructura de datos y algoritmos 2
 #include <cassert>
 #include <string>
 #include <iostream>
 #include <limits>
-#include "Lista/lista.cpp"
-#include "grafo.cpp"
-
+#include "tads/Dijkstra.cpp"
 using namespace std;
 
-struct ciudad
-{
-    int id;
-    string nombre;
-
-    ciudad(int id, string nombre) : id(id), nombre(nombre) {}
-};
-
-struct mision
-{
-    int id;
-    string nombre;
-    int idCiudadOrigen;
-    Lista<int> listaIdMisiones;
-
-    mision(int id, string nombre, int idCiudadOrigen, Lista<int> listaIdMisiones) : id(id), nombre(nombre), idCiudadOrigen(idCiudadOrigen), listaIdMisiones(listaIdMisiones) {}
-};
-
-int main()
-{
-    cin >> m; // misiones
-
-    Grafo<mision> *grafoMisiones = new Grafo<mision>(m + 1);
-
-    for (int i = 1; i <= m; i++)
-    {
-        int idMision;
-        string nombreMision;
-        int idCiudadOrigen;
-        Lista<int> listaIdMisiones;
-
-        cin >> idMision >> nombreMision >> idCiudadOrigen;
+int main() {
+    int numTareas, numCiudades, ciudadInicial;
+    cin >> numTareas;
+    Tarea* tareas[MAX_TAREAS] = {NULL};
+    for (int i = 0; i < numTareas; i++) {
+        int idTarea, idCiudad;
+        string nombreTarea;
+        cin >> idTarea >> nombreTarea >> idCiudad;
+        tareas[idTarea - 1] = new Tarea(idTarea, nombreTarea, idCiudad);
 
         int dependencia;
-        cin >> dependencia;
-        while (dependencia != 0)
-        {
-            listaIdMisiones.InsertarFin(dependencia);
-            cin >> dependencia;
+        while (cin >> dependencia && dependencia != 0) {
+            tareas[idTarea - 1]->dependencias.agregarFinal(dependencia - 1);
         }
     }
-
-    cin >> c; // ciudades
-    cin >> o; // ciudad origen
-
-    Grafo<ciudad> *grafoCiudades = new Grafo<ciudad>(c + 1);
-
-    for (int i = 1; i <= c; i++)
-    {
+    cin >> numCiudades >> ciudadInicial;
+    GrafoTareas grafo(numCiudades);
+    for (int i = 0; i < numCiudades; i++) {
         int idCiudad;
         string nombreCiudad;
-
-        cin >> idCiudad;
-        cin >> nombreCiudad;
-
-        ciudad *ciudad = new ciudad(idCiudad, nombreCiudad);
-        grafoCiudades->AgregarVertice(ciudad);
-
-
+        cin >> idCiudad >> nombreCiudad;
+        grafo.setNombreCiudad(idCiudad, nombreCiudad);
     }
 
-    cin >> e; // cantidad de lineas que representan conexionese entre ciudades
-
-    for (int i = 0; i < e; i++)
-    {
-        int idCiudadOrigen;
-        int idCiudadDestino;
-        int tiempoDesplazamiento;
-
-        cin >> idCiudadOrigen;
-        cin >> idCiudadDestino;
-        cin >> tiempoDesplazamiento;
+    int numConexiones;
+    cin >> numConexiones;
+    for (int i = 0; i < numConexiones; i++) {
+        int origen, destino, costo;
+        cin >> origen >> destino >> costo;
+        grafo.agregarConexion(origen, destino, costo);
     }
 
- 
-    Lista<int> *ordenTopologico = grafoMisiones->OrdenTopologico();
+    ListaElementos orden;
+    ordenTareas(tareas, numTareas, orden);
 
-    
+    Elemento* actualElemento = orden.cabeza;
+    int ciudadActual = ciudadInicial;
+    int tiempoTotal = 0;
+    cout << "Ciudad inicial: " << grafo.nombreCiudad[ciudadActual - 1] << endl;
 
+    // Recorremos las tareas
+    while (actualElemento) {
+        Tarea* tarea = tareas[actualElemento->valor];
+        ListaElementos camino;
+        int tiempo = grafo.realizarDijkstra(ciudadActual, tarea->idCiudad, camino);
+
+        Elemento* nodoCamino = camino.cabeza;
+        while (nodoCamino) {
+            cout << grafo.nombreCiudad[nodoCamino->valor] << " -> ";
+            nodoCamino = nodoCamino->siguiente;
+        }
+
+        cout << "Tarea: " << tarea->nombreTarea
+             << " - " << grafo.nombreCiudad[tarea->idCiudad - 1]
+             << " - Tiempo de viaje: " << tiempo << endl;
+
+        ciudadActual = tarea->idCiudad;
+        tiempoTotal += tiempo;
+        actualElemento = actualElemento->siguiente;
+    }
+
+    cout << "Tareas completadas con exito." << endl;
+    cout << "Tiempo total de viaje: " << tiempoTotal << endl;
+    for (int i = 0; i < numTareas; i++) {
+        delete tareas[i];
+    }
 
     return 0;
 }

@@ -62,7 +62,19 @@
         "variant": "cpp",
         "vector": "cpp",
         "algorithm": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "bit": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "exception": "cpp",
+        "list": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "xhash": "cpp",
+        "xlocinfo": "cpp",
+        "xstddef": "cpp",
+        "xstring": "cpp",
+        "xtr1common": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
