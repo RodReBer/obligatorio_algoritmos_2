@@ -67,7 +67,7 @@ int main()
         ciudad *ciudad = new ciudad(idCiudad, nombreCiudad);
         grafoCiudades->AgregarVertice(ciudad);
 
-        
+
     }
 
     cin >> e; // cantidad de lineas que representan conexionese entre ciudades
@@ -85,6 +85,8 @@ int main()
 
  
     Lista<int> *ordenTopologico = grafoMisiones->OrdenTopologico();
+
+    
 
 
     return 0;
