@@ -63,6 +63,11 @@ int main()
 
         cin >> idCiudad;
         cin >> nombreCiudad;
+
+        ciudad *ciudad = new ciudad(idCiudad, nombreCiudad);
+        grafoCiudades->AgregarVertice(ciudad);
+
+        
     }
 
     cin >> e; // cantidad de lineas que representan conexionese entre ciudades
