@@ -1,4 +1,3 @@
-
 struct Libro
 {
     int id;

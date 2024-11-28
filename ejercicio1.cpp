@@ -18,7 +18,7 @@ struct Libro
 
     Libro(int id, string titulo) : id(id), titulo(titulo), habilitado(true) {}
 };
-
+// 💛🖤
 struct NodoAVL
 {
     Libro *libro;
@@ -28,17 +28,17 @@ struct NodoAVL
 
     NodoAVL(Libro *libro) : libro(libro), izq(NULL), der(NULL), altura(0) {}
 };
-
+// 💛🖤
 int alt(NodoAVL *nodo)
 {
     return nodo ? nodo->altura : 0;
 }
-
+// 💛🖤
 int obtenerBalance(NodoAVL *nodo)
 {
     return nodo ? alt(nodo->izq) - alt(nodo->der) : 0;
 }
-
+// 💛🖤
 NodoAVL *rotacionIzq(NodoAVL *x)
 {
     NodoAVL *y = x->der;
@@ -55,7 +55,7 @@ NodoAVL *rotacionIzq(NodoAVL *x)
     // Return new root
     return y;
 }
-
+// 💛🖤
 NodoAVL *rotacionDer(NodoAVL *y)
 {
     NodoAVL *x = y->izq;
@@ -72,7 +72,7 @@ NodoAVL *rotacionDer(NodoAVL *y)
     // Return new root
     return x;
 }
-
+// 💛🖤
 // extraido desde las ppt de aulas (https://avl.uruguayan.ninja/7)
 
 NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int &habilitados, int &deshabilitados)
@@ -137,7 +137,7 @@ NodoAVL *add(NodoAVL *nodo, Libro *nuevoLibro, int &habilitados, int &deshabilit
     /* return the (unchanged) node pointer */
     return nodo;
 }
-
+// 💛🖤
 Libro *findLibro(NodoAVL *nodo, int id)
 {
     while (nodo)
@@ -158,7 +158,7 @@ Libro *findLibro(NodoAVL *nodo, int id)
     std::cout << "libro_no_encontrado" << std::endl;
     return NULL;
 }
-
+// 💛🖤
 void toggle(NodoAVL *nodo, int id, int &habilitados, int &deshabilitados)
 {
     Libro *libro = findLibro(nodo, id);
@@ -177,12 +177,12 @@ void toggle(NodoAVL *nodo, int id, int &habilitados, int &deshabilitados)
         libro->habilitado = !libro->habilitado;
     }
 }
-
+// 💛🖤
 void count(NodoAVL *nodo, int habilitados, int deshabilitados)
 {
     cout << habilitados + deshabilitados << " " << habilitados << " " << deshabilitados << endl;
 }
-
+// 💛🖤
 void liberarMemoria(NodoAVL *nodo)
 {
     if (nodo == NULL)
@@ -194,7 +194,7 @@ void liberarMemoria(NodoAVL *nodo)
     delete nodo->libro;
     delete nodo;
 }
-
+// 💛🖤
 int main()
 {
     //  // IMPORTANTE! BORRAR O COMENTAR LAS SIGUIENTES LINEAS  EN TODOS LOS EJERCICIOS DEL OBLIGATORIO. NO PUEDEN ESTAR EN NINGUNA ENTREGA!
@@ -258,3 +258,4 @@ int main()
 
     return 0;
 }
+// 💛🖤

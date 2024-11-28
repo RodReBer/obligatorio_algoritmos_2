@@ -12,6 +12,8 @@ double distanciaEfectiva(int x1, int y1, int p1, int x2, int y2, int p2) {
 }
 
 // Implementación de quicksort
+
+// este algoritmo de quicksort lo sacamos de la clase de algoritmos y lo adaptamos con chatgpt
 void quicksort(Ciudad* ciudades, int inicio, int fin) {
     if (inicio >= fin) return;
 

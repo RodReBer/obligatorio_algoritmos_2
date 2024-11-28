@@ -2,6 +2,7 @@
 #include <cmath>
 #include <cstring>
 #include "funciones/ejercicio8.cpp"
+#define INF 999999999
 
 using namespace std;
 
@@ -20,7 +21,7 @@ int main() {
     quicksort(ciudades, 0, n - 1);
 
     // Buscar el par más cercano
-    double mejorDistancia = 1e18;
+    double mejorDistancia = INF;
     Ciudad mejor1, mejor2;
 
     for (int i = 0; i < n; i++) {

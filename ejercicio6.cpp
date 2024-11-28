@@ -3,15 +3,23 @@
 #include <iostream>
 #include <climits>
 #include <cstring>
+#include "tads/Lista/lista.cpp"
 #define MAX_CIUDADES 300
 
 using namespace std;
+
+struct conexion
+{
+    int destino;
+    int costo;
+};
 
 struct Grafo
 {
     int matriz[MAX_CIUDADES][MAX_CIUDADES];
     string nombres[MAX_CIUDADES];
     int numCiudades;
+
 
     void inicializar(int ciudades)
     {
@@ -88,30 +96,31 @@ struct Grafo
         imprimirCamino(anterior, anterior[destino], grafo);
         cout << " -> " << grafo->nombres[destino];
     }
-};
-// Duplicar costos solo en la primera opción
-void duplicarCostos(Grafo *grafo, int anterior[], int destino)
-{
-    while (anterior[destino] != -1)
-    {
-        int origen = anterior[destino];
-        grafo->matriz[origen][destino] *= 2;
-        grafo->matriz[destino][origen] *= 2;
-        destino = origen;
-    }
-}
 
-// Restaurar los costos a su valor original
-void restaurarCostos(Grafo *grafo, int anterior[], int destino)
-{
-    while (anterior[destino] != -1)
+    // Duplicar costos solo en la primera opción
+    void duplicarCostos(Grafo *grafo, int anterior[], int destino)
     {
-        int origen = anterior[destino];
-        grafo->matriz[origen][destino] /= 2;
-        grafo->matriz[destino][origen] /= 2;
-        destino = origen;
+        while (anterior[destino] != -1)
+        {
+            int origen = anterior[destino];
+            grafo->matriz[origen][destino] *= 2;
+            grafo->matriz[destino][origen] *= 2;
+            destino = origen;
+        }
     }
-}
+
+    // Restaurar los costos a su valor original
+    void restaurarCostos(Grafo *grafo, int anterior[], int destino)
+    {
+        while (anterior[destino] != -1)
+        {
+            int origen = anterior[destino];
+            grafo->matriz[origen][destino] /= 2;
+            grafo->matriz[destino][origen] /= 2;
+            destino = origen;
+        }
+    }
+};
 
 int main()
 {
@@ -141,28 +150,28 @@ int main()
 
     grafo->dijkstra(start - 1, dist[0], ant[0], grafo);
     int costoA1 = dist[0][entidad - 1];
-    duplicarCostos(grafo, ant[0], entidad - 1);
+    grafo->duplicarCostos(grafo, ant[0], entidad - 1);
 
     grafo->dijkstra(entidad - 1, dist[1], ant[1], grafo);
     int costoA2 = costoA1 + dist[1][equipo - 1];
-    duplicarCostos(grafo, ant[1], equipo - 1);
+    grafo->duplicarCostos(grafo, ant[1], equipo - 1);
 
     grafo->dijkstra(equipo - 1, dist[2], ant[2], grafo);
     int costoA3 = costoA2 + dist[2][extraccion - 1];
     int costoTotalA = costoA3;
 
     // Restaurar costos
-    restaurarCostos(grafo, ant[0], entidad - 1);
-    restaurarCostos(grafo, ant[1], equipo - 1);
+    grafo->restaurarCostos(grafo, ant[0], entidad - 1);
+    grafo->restaurarCostos(grafo, ant[1], equipo - 1);
 
     // Calcular la segunda opción de ruta y costos totales
     grafo->dijkstra(start - 1, dist[3], ant[3], grafo);
     int costoB1 = dist[3][equipo - 1];
-    duplicarCostos(grafo, ant[3], equipo - 1);
+    grafo->duplicarCostos(grafo, ant[3], equipo - 1);
 
     grafo->dijkstra(equipo - 1, dist[4], ant[4], grafo);
     int costoB2 = costoB1 + dist[4][entidad - 1];
-    duplicarCostos(grafo, ant[4], entidad - 1);
+    grafo->duplicarCostos(grafo, ant[4], entidad - 1);
 
     grafo->dijkstra(entidad - 1, dist[5], ant[5], grafo);
     int costoB3 = costoB2 + dist[5][extraccion - 1];
@@ -170,28 +179,26 @@ int main()
 
     // Restaurar costos
 
-
-
     // Comparar y decidir la mejor opción
     // Decisión sobre la mejor ruta
     (costoTotalA <= costoTotalB) ? (
-        cout << "BE11, la mejor ruta es Desactivar la Entidad, buscar equipo y punto de extraccion con un costo de " << costoTotalA << endl, 
-        cout << "La otra opcion tiene un costo de " << costoTotalB << endl, 
-        cout << "Paso 1: ", grafo->imprimirCamino(ant[0], entidad - 1, grafo), 
-        cout << " -> Desactivar la Entidad" << endl, 
-        cout << "Paso 2: ", grafo->imprimirCamino(ant[1], equipo - 1, grafo), 
-        cout << " -> Buscar equipo" << endl, 
-        cout << "Paso 3: ", grafo->imprimirCamino(ant[2], extraccion - 1, grafo), 
+        cout << "BE11, la mejor ruta es Desactivar la Entidad, buscar equipo y punto de extraccion con un costo de " << costoTotalA << endl,
+        cout << "La otra opcion tiene un costo de " << costoTotalB << endl,
+        cout << "Paso 1: ", grafo->imprimirCamino(ant[0], entidad - 1, grafo),
+        cout << " -> Desactivar la Entidad" << endl,
+        cout << "Paso 2: ", grafo->imprimirCamino(ant[1], equipo - 1, grafo),
+        cout << " -> Buscar equipo" << endl,
+        cout << "Paso 3: ", grafo->imprimirCamino(ant[2], extraccion - 1, grafo),
         cout << " -> Ir a Punto de extraccion" << endl)
                                  :
                                  // Si la segunda opción es mejor
         (cout << "BE11, la mejor ruta es Buscar equipo, Desactivar la Entidad y punto de extraccion con un costo de " << costoTotalB << endl,
          cout << "La otra opcion tiene un costo de " << costoTotalA << endl,
-         cout << "Paso 1: ", grafo->imprimirCamino(ant[3], equipo - 1, grafo), 
+         cout << "Paso 1: ", grafo->imprimirCamino(ant[3], equipo - 1, grafo),
          cout << " -> Buscar equipo" << endl,
-         cout << "Paso 2: ", grafo->imprimirCamino(ant[4], entidad - 1, grafo), 
+         cout << "Paso 2: ", grafo->imprimirCamino(ant[4], entidad - 1, grafo),
          cout << " -> Desactivar la Entidad" << endl,
-         cout << "Paso 3: ", grafo->imprimirCamino(ant[5], extraccion - 1, grafo), 
+         cout << "Paso 3: ", grafo->imprimirCamino(ant[5], extraccion - 1, grafo),
          cout << " -> Ir a Punto de extraccion" << endl);
 
     delete grafo; // Liberar memoria

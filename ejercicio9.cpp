@@ -27,6 +27,9 @@ int main()
     int K = 11; // Queremos seleccionar exactamente 11 jugadores
 
     // Crear tabla DP de 4 dimensiones
+
+    // La habiamos hecho de 3 dimensiones pero al final nos dimos cuenta que precisabamos la cuarta dimension para saber los jugadores seleccionados y le pedimos a chatgpt que nos lo haga de una dimension mas con esos pedimientos que queriamos para ahorrarnos tiempo. :)
+
     int ****dp = new int ***[J + 1];
     for (int j = 0; j <= J; j++)
     {
@@ -46,20 +49,23 @@ int main()
     }
 
     // Caso base
-    dp[0][0][0][0] = 0; // Si no hemos seleccionado jugadores, la valoración es 0.
+    dp[0][0][0][0] = 0; // Si no seleccionamos jugadores, la valoración es 0.
 
     // Programación dinámica
     for (int j = 1; j <= J; j++)
     {
+        //jugador numero J
         int valoracion = calcularValoracion(ritmo[j - 1], tiro[j - 1], pase[j - 1], regate[j - 1], defensa[j - 1], fisico[j - 1], forma[j - 1], confianza[j - 1]);
+
         int costo = sueldo[j - 1];
+
         int esExtranjero = (extranjero[j - 1] == "Si");
 
-        for (int k = 0; k <= K; k++)
+        for (int k = 0; k <= K; k++) // Jugadores seleccionados
         {
-            for (int p = 0; p <= P; p++)
+            for (int p = 0; p <= P; p++) // Dinero disponible
             {
-                for (int e = 0; e <= E; e++)
+                for (int e = 0; e <= E; e++) // Extranjeros seleccionados
                 {
                     // Caso sin incluir al jugador
                     if (dp[j - 1][k][p][e] != -1)

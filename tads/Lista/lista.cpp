@@ -1,6 +1,7 @@
 #include <iostream>
 #include "nodolista.cpp"
 #include "iteradorlista.cpp"
+#pragma once
 using namespace std;
 
 template<class T>
